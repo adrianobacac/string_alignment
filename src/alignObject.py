@@ -23,8 +23,8 @@ class alignObject(object):
     
     gapSymbol = "-"
     
-    gapOpenPenalty = -10
-    gapAffinePenalty = -3
+    gapOpenPenalty = -7
+    gapAffinePenalty = -1
     
     rowGapCount = 0
     colGapCount = 0
@@ -39,7 +39,7 @@ class alignObject(object):
         
         
     @abc.abstractmethod
-    def initScoreMarix(self):
+    def initScoreMarix(self, rowString, colString):
         '''
         
         '''
@@ -51,6 +51,12 @@ class alignObject(object):
         '''
         
     def gapPenalty(self, count):
+        
+        if(count > 0):
+            return self.gapAffinePenalty
+        else:
+            return self.gapOpenPenalty
+        
         return self.gapOpenPenalty - self.gapAffinePenalty * count
     
     
@@ -71,14 +77,18 @@ class alignObject(object):
     
     
     def maxChoice(self, options):  
+        
+        return max(options), options.index(max(options))
         maxValue = options[0]
         maxIndex = 0
         
         for i in range(1, len(options)):
+            
             if(options[i] > maxValue):
                 maxValue = options[i]
                 maxIndex = i
-            
+            elif(options[i]==maxValue):
+                pass
         return (maxValue, maxIndex)
                 
     @abc.abstractmethod               
@@ -124,18 +134,26 @@ class alignObject(object):
             elif option == self.up:
                 row -= 1
             else:
-                raise Exception("WTF")
+                assert "Invalid option"
             
             option = self.tracebackMatrix[row][col]
             
         return path    
                 
-    def printMatrix(self, matrix):
-        for i in range(len(matrix)):
-            print("")
-            for j in range(len(matrix[0])):
+    def printMatrix(self):
+        print("\t\t\t", end="")
+        for i in range(len(self.tracebackMatrix[0])-1):
+            print("%8s"%self.colString[i], end="\t")
+        print()
+        for i in range(len(self.tracebackMatrix)):
+            print()
+            if(i==0):
+                print("\t", end="")
+            else:
+                print(self.rowString[i-1], end="\t")
+            for j in range(len(self.tracebackMatrix[0])):
                 try:
-                    print("%7s"%(matrix[i][j]), end="")
+                    print("[%4s, %4s]\t"%(self.scoreMatrix[i][j], self.tracebackMatrix[i][j]), end="")
                 except:
                     pass
                 pass
@@ -155,36 +173,56 @@ class alignObject(object):
         firstAlignedReversed = []
         secondAlignedReversed = []
         
-        (iFirst, iSecond) = self.startPosition()
-        iFirst-=1
-        iSecond-=1
         
+        (iFirst, iSecond) = self.startPosition()
+        #iFirst-=1
+        #iSecond-=1
+        
+        matchTypeReversed=[]
+        
+        score = 0 
         for option in tracebackPath:
             
             
             if(option == self.diag):
-                firstAlignedReversed.append(self.rowString[iFirst])
+                
+                if(self.rowString[iFirst-1]==self.colString[iSecond-1]):
+                    matchTypeReversed.append("|")
+                else:
+                    matchTypeReversed.append(":")
+                
+                score +=self.scoreMatrix[iFirst][iSecond]
+                firstAlignedReversed.append(self.rowString[iFirst-1])
                 iFirst -= 1
                 
-                secondAlignedReversed.append(self.colString[iSecond])
+                secondAlignedReversed.append(self.colString[iSecond-1])
                 iSecond -= 1
                 
+                
             elif(option == self.left):
+                
+                matchTypeReversed.append(" ")
+                
+                score +=self.scoreMatrix[iFirst][iSecond]
                 firstAlignedReversed.append(self.gapSymbol)
                 
-                secondAlignedReversed.append(self.colString[iSecond])
+                secondAlignedReversed.append(self.colString[iSecond-1])
                 iSecond -= 1
                 
             elif(option == self.up):
-                firstAlignedReversed.append(self.rowString[iFirst])
+                
+                matchTypeReversed.append(" ")
+                
+                score +=self.scoreMatrix[iFirst][iSecond]
+                firstAlignedReversed.append(self.rowString[iFirst-1])
                 iFirst -= 1
                 
                 secondAlignedReversed.append(self.gapSymbol)
                 
         seq1Aligned = "".join(reversed(firstAlignedReversed))
         seq2Aligned = "".join(reversed(secondAlignedReversed))
+        matchTypeAligned = "".join(reversed(matchTypeReversed))
         
-        print(seq1Aligned)
-        print(seq2Aligned)
-        return seq1Aligned, seq2Aligned
+       
+        return seq1Aligned,seq2Aligned,matchTypeAligned, score
         

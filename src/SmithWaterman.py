@@ -6,12 +6,12 @@ Created on Jul 17, 2014
 from src.alignObject import alignObject
 
 
+
+
+
 class SmithWaterman(alignObject):
     
-    done = "done"
-    up = "up"
-    left = "left"
-    diag = "diag"
+
     
     maxValue = 0
     maxValueRow = 0
@@ -19,6 +19,8 @@ class SmithWaterman(alignObject):
    
     
     def initScoreMarix(self):
+        
+        
         self.scoreMatrix = [[0]]
         
         rowLen = len(self.rowString)
@@ -31,8 +33,10 @@ class SmithWaterman(alignObject):
             self.scoreMatrix [0].append(0)
             colLen -= 1    
             
-            
     def initTracebackMatrix(self):
+        
+
+        
         self.tracebackMatrix = [[self.done]]
         
         rowLen = len(self.rowString)
@@ -44,10 +48,10 @@ class SmithWaterman(alignObject):
         while(colLen > 0):
             self.tracebackMatrix[0].append(self.done)
             colLen -= 1    
-            
-            
+
     def score(self, row, col):
-     
+
+        
         diagScore = self.diagScore(
                               row,
                               col,
@@ -84,15 +88,4 @@ class SmithWaterman(alignObject):
         '''
         return self.maxValueRow, self.maxValueCol
     
-    
- 
-similarityMatrix = {
-                  "a":{"a":10, "c":0, "g":0, "t":0},
-                  "c":{"a":0, "c":10, "g":0, "t":0},
-                  "g":{"a":0, "c":0, "g":10, "t":0},
-                  "t":{"a":0, "c":0, "g":0, "t":10}
-                  }
 
-test = SmithWaterman(similarityMatrix, -10, -1)
-
-test.align("aaagtgtgtcaac", "aac")

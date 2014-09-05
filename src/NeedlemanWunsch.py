@@ -8,27 +8,31 @@ from src.alignObject import alignObject
 class NeedlemanWunsch(alignObject):
     
     def initScoreMarix(self):
-        self.scoreMatrix = [[self.gapOpenPenalty]]
+        self.scoreMatrix = [[0]]
         
-        rowGapCnt=0
+        
         rowLen = len(self.rowString)
         rowPenalty = self.gapPenalty(0)
         
-        while(rowLen > 0):
+        currentRow = 0
+        while(currentRow <rowLen):
             self.scoreMatrix .append([rowPenalty])   
-            rowGapCnt+=1
-            rowPenalty += self.gapPenalty(0)
-            rowLen -= 1
             
-        colGapCnt = 0
+            currentRow+=1
+            rowPenalty += self.gapPenalty(1)
+            
+            
+        
         colLen = len(self.colString)
         colPenalty = self.gapPenalty(0)
         
-        while(colLen > 0):
+        currentCol = 0
+        while(currentCol<colLen):
             self.scoreMatrix [0].append(colPenalty)
-            colGapCnt+=1
-            colPenalty += self.gapPenalty(0)
-            colLen -= 1    
+            
+            currentCol+=1
+            colPenalty += self.gapPenalty(1)
+            
         
     
     def initTracebackMatrix(self):
@@ -54,17 +58,16 @@ class NeedlemanWunsch(alignObject):
         upScore = self.upScore(row, col)
         leftScore = self.leftScore(row, col)
         
-        options = [leftScore,upScore , diagScore]
-        self.printMatrix(self.scoreMatrix)
-        print()
+        options = [leftScore, upScore , diagScore]
+        
         (value, choice) = self.maxChoice(options)
         
-        if(choice == 2):
-            option = self.diag
-        elif(choice ==1):
-            option = self.up
-        elif(choice==0):
+        if(choice == 0):
             option = self.left
+        elif(choice == 1):
+            option = self.up
+        elif(choice == 2):
+            option = self.diag
         else:
             assert "Invalid option"
         return (value, option)
@@ -78,16 +81,3 @@ class NeedlemanWunsch(alignObject):
    
                 
 
-    
- 
-similarityMatrix = {
-                  "a":{"a":10, "c":0, "g":0, "t":0},
-                  "c":{"a":0, "c":10, "g":0, "t":0},
-                  "g":{"a":0, "c":0, "g":10, "t":0},
-                  "t":{"a":0, "c":0, "g":0, "t":10}
-                  }
-                   
-test = NeedlemanWunsch(similarityMatrix,-10, -1)
-    
-
-test.align("gaaaagagaaagaaa", "gagaaa")
