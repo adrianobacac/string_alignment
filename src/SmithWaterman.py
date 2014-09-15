@@ -20,6 +20,9 @@ class SmithWaterman(alignObject):
     
     def initScoreMarix(self):
         
+        self.maxValue=0
+        self.maxValueCol=0
+        self.maxValueRow=0
         
         self.scoreMatrix = [[0]]
         
