@@ -29,16 +29,14 @@ class MinHash(object):
         
         '''
         hashedShingles = []
-        shingles = []
         for i in range(0, len(seq) - shingleLength + 1):
             hashedShingles.append(hash(seq[i:i + shingleLength]))
-            shingles.append(seq[i:i + shingleLength])
         minValues = []
         
         for randNum in self.randomNums:
             minValues.append(min([self.simpleHash(hashedShingle, randNum) for hashedShingle in hashedShingles]))
         
-        return set(minValues), set(shingles)
+        return set(minValues)
         
         
     def compareSets(self, set1, set2):
@@ -54,10 +52,10 @@ class MinHash(object):
         
         if(len(seq1)>=shingleLength and len(seq2) >=shingleLength):
         
-            set1, set1Full = self.minHashValues(seq1, shingleLength)
-            set2, set2Full = self.minHashValues(seq2, shingleLength)
+            set1 = self.minHashValues(seq1, shingleLength)
+            set2 = self.minHashValues(seq2, shingleLength)
             
-            return self.compareSets(set1, set2), self.compareSets(set1Full, set2Full)
+            return self.compareSets(set1, set2)
             
         
         elif(len(seq1)<shingleLength):
