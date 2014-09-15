@@ -23,8 +23,9 @@ class alignObject(object):
     
     gapSymbol = "-"
     
-    gapOpenPenalty = -7
-    gapAffinePenalty = -1
+    gapOpenPenalty = -9
+    gapAffinePenalty = -2
+    
     
     rowGapCount = 0
     colGapCount = 0
@@ -32,7 +33,7 @@ class alignObject(object):
     rowString = ""
     colString = ""
     
-    def __init__(self, similarityMatrix, gapOpenPenalty=-10, gapAffinePenalty=-3):
+    def __init__(self, similarityMatrix, gapOpenPenalty=-9, gapAffinePenalty=-2):
         self.similarityMatrix = similarityMatrix
         self.gapOpenPenalty = gapOpenPenalty
         self.gapAffinePenalty = gapAffinePenalty
@@ -51,7 +52,7 @@ class alignObject(object):
         '''
         
     def gapPenalty(self, count):
-        
+
         if(count > 0):
             return self.gapAffinePenalty
         else:
@@ -79,18 +80,7 @@ class alignObject(object):
     def maxChoice(self, options):  
         
         return max(options), options.index(max(options))
-        maxValue = options[0]
-        maxIndex = 0
-        
-        for i in range(1, len(options)):
-            
-            if(options[i] > maxValue):
-                maxValue = options[i]
-                maxIndex = i
-            elif(options[i]==maxValue):
-                pass
-        return (maxValue, maxIndex)
-                
+
     @abc.abstractmethod               
     def score(self, row, col):
         '''
@@ -121,7 +111,6 @@ class alignObject(object):
         path = []
         
         (row, col) = self.startPosition()
-        
         option = self.tracebackMatrix[row][col]
         
         while(option != self.done):
@@ -135,7 +124,6 @@ class alignObject(object):
                 row -= 1
             else:
                 assert "Invalid option"
-            
             option = self.tracebackMatrix[row][col]
             
         return path    
@@ -160,7 +148,7 @@ class alignObject(object):
             
             
 
-    def align(self, seq1, seq2):
+    def align(self, seq1, seq2, printing = False):
         
         (self.rowString, self.colString) = (seq1, seq2) if len(seq1) < len(seq2) else (seq2, seq1)
         
@@ -223,6 +211,11 @@ class alignObject(object):
         seq2Aligned = "".join(reversed(secondAlignedReversed))
         matchTypeAligned = "".join(reversed(matchTypeReversed))
         
+        if(printing == True):
+            print(seq1Aligned)
+            print(matchTypeAligned)
+            print(seq2Aligned)
+            print("Score:", score)
        
         return seq1Aligned,seq2Aligned,matchTypeAligned, score
         
